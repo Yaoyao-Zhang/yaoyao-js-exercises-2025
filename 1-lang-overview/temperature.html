@@ -63,22 +63,37 @@
 
         console.log("---------------------")
         console.log("PART 1...")
-
-
-
+        // Part 1 
+        const celsius1 = -270;
+        const fahrenheit1 = (9 / 5) * celsius1 + 32;
+        console.log("Part 1 - Celsius:", celsius1, "=> Fahrenheit:", fahrenheit1);
 
 
         console.log("---------------------")
         console.log("PART 2...")
+        // Part 2
+        function calculateTemp(tempC) {
+        const tempF = (9 / 5) * tempC + 32;
+        console.log("Celsius:", tempC, "=> Fahrenheit:", tempF);
+        return tempF;
+        }
 
-
-
-
-
+        // Test with -270
+        calculateTemp(-270);
 
         console.log("---------------------")
         console.log("PART 3...")
+            
+        // Part 3
+        function handleClick() {
+            const inputCelsius = document.getElementById("input-temp-c").value;
+            const fahrenheit = calculateTemp(parseFloat(inputCelsius));
+            document.getElementById("display-temp-f").textContent = fahrenheit.toFixed(2);
+        }
 
+
+    // Attach event listener to the button AFTER defining the function
+    document.getElementById("calculate").addEventListener("click", handleClick);
 
 
 
