@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,6 +44,14 @@
         and display the resulting number of years and actual ending balance on the page.
     </p>
 
+    <h3>Run Your Investment Simulation</h3>
+    <label>Initial Balance: <input type="number" id="initialBalance" value="150000" /></label><br>
+    <label>Target Balance: <input type="number" id="targetBalance" value="1000000" /></label><br>
+    <label>Mean Return (e.g., 0.08): <input type="number" id="mean" value="0.08" step="0.01" /></label><br>
+    <label>Std Dev (e.g., 0.15): <input type="number" id="stdev" value="0.15" step="0.01" /></label><br>
+    <button onclick="runSimulation()">Run Simulation</button>
+
+<div id="results"></div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/d3-random@3"></script>
@@ -96,8 +102,33 @@
         console.log("---------------------")
         console.log("PART 3...")
 
+        function runSimulation() {
+        const initialBalance = parseFloat(document.getElementById("initialBalance").value);
+        const targetBalance = parseFloat(document.getElementById("targetBalance").value);
+        const mean = parseFloat(document.getElementById("mean").value);
+        const stdev = parseFloat(document.getElementById("stdev").value);
 
+        let balance = initialBalance;
+        let year = 0;
+        const rateGenerator = d3.randomNormal(mean, stdev);
+        const rates = [];
 
+        while (balance < targetBalance) {
+            const rate = rateGenerator();
+            rates.push(rate);
+            balance *= (1 + rate);
+            year++;
+        }
+
+        const resultDiv = document.getElementById("results");
+        resultDiv.innerHTML = `
+            <p><strong>Original Balance:</strong> ${formatUSD(initialBalance)}</p>
+            <p><strong>Target Balance:</strong> ${formatUSD(targetBalance)}</p>
+            <p><strong>Years Taken:</strong> ${year}</p>
+            <p><strong>Final Balance:</strong> ${formatUSD(balance)}</p>
+            <p><strong>Yearly Returns:</strong> ${rates.map(r => (r * 100).toFixed(2) + '%').join(', ')}</p>
+        `;
+    }
 
     </script>
 </body>
