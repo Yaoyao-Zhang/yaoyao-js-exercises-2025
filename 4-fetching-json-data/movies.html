@@ -80,11 +80,10 @@
 
         fetch(requestUrl).then(response => response.json())
             .then(function(data){
-                console.log("DATA", data)
+            console.log("DATA", data)
 
-
-                console.log("---------------------")
-                console.log("PART 1...")
+            console.log("---------------------")
+            console.log("PART 1...")
 
                 console.log(data.length)
 
@@ -104,17 +103,39 @@
 
                 var highestRated = sortedMovies[0]
                 console.log("HIGHEST RATED:", highestRated.Title, highestRated.Rating)
+            // ---------------------
+            console.log("PART 2...")
 
+            // Get the dropdown
+            const dropdown = document.getElementById("select-movie");
 
+            // A. Populate the dropdown menu
+            data.forEach(movie => {
+                const option = document.createElement("option");
+                option.value = movie.Title;
+                option.textContent = movie.Title;
+                dropdown.appendChild(option);
+            });
 
-                console.log("---------------------")
-                console.log("PART 2...")
+            // B. Define the updateMovieInfo function
+            function updateMovieInfo() {
+                const selectedTitle = dropdown.value;
+                const selectedMovie = data.find(m => m.Title === selectedTitle);
 
+                if (selectedMovie) {
+                    document.getElementById("display-title").textContent = selectedMovie.Title;
+                    document.getElementById("display-year").textContent = selectedMovie.Year;
+                    document.getElementById("display-rating").textContent = selectedMovie.Rating;
 
+                    const imageContainer = document.getElementById("image-container");
+                    imageContainer.innerHTML = `<img src="${selectedMovie.Poster_URL}" alt="${selectedMovie.Title} Poster" style="max-width:200px;">`;
+                }
+            }
 
+            // C. Add event listener
+            dropdown.addEventListener("change", updateMovieInfo);
 
-
-            })
+          })
             .catch(err => console.log(err))
 
     </script>
