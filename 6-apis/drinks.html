@@ -60,30 +60,51 @@
 
 
 
-
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script type="text/javascript">
 
-        var requestUrl = "TODO"
+        // URL for non-alcoholic drinks
+        var requestUrl = "https://www.thecocktaildb.com/api/json/v1/1/filter.php?a=Non_Alcoholic";
 
-        d3.json(requestUrl).then(function(data){
-            console.log("DATA:", data)
+        d3.json(requestUrl).then(function(data) {
+            // PART 1: Logging to console
+            console.log("DATA:", data);
+            console.log("---------------------");
+            console.log("PART 1...");
 
+            // Number of drinks
+            var drinks = data.drinks;
+            console.log("Number of non-alcoholic drinks:", drinks.length);
 
-            console.log("---------------------")
-            console.log("PART 1...")
+            // Loop and log each drink's name and id
+            drinks.forEach(function(drink) {
+                console.log("Name:", drink.strDrink, "| ID:", drink.idDrink);
+            });
 
+            console.log("---------------------");
+            console.log("PART 2...");
 
+            // PART 2: Display on page
+            // Display count
+            d3.select('#display-drinks-count')
+                .text(drinks.length);
 
+            // Display each drink's name and image
+            var container = d3.select('#display-drinks');
+            drinks.forEach(function(drink) {
+                var item = container.append('div')
+                    .style('margin', '10px');
 
+                item.append('p')
+                    .text(drink.strDrink);
 
-            console.log("---------------------")
-            console.log("PART 2...")
-
-
-
-
-        })
+                item.append('img')
+                    .attr('src', drink.strDrinkThumb)
+                    .attr('height', 100);
+            });
+        }).catch(function(error) {
+            console.error('Error fetching data:', error);
+        });
 
     </script>
 </body>
