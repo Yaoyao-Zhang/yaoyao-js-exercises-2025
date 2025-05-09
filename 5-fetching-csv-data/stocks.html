@@ -2,127 +2,139 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Company Overview (JSON)</title>
+    <title>Stocks (CSV)</title>
 </head>
 <body>
 
-    <h1>Company Overview (JSON)</h1>
+    <h1>Stocks (CSV)</h1>
     <a href="../index.html">Home</a>
 
     <h2>Dataset Information</h2>
-    <p>For this exercise, we will use data from the AlphaVantage API.
-        Specifically we will use the <a href="https://www.alphavantage.co/documentation/#company-overview">"Company Overview" endpoint</a>
-        to fetch financial information about a given company.
-        Consult the API documentation to learn more.
+    <p>For this exercise, we will use a handful of CSV files that have been uploaded to the Internet.
+        The CSV files contain historical stock data for a number of companies.
+        There is a CSV file for each of the following symbols: AAPL, GOOGL, MSFT, NFLX, NVDA, and SPOT.
+        The name of each CSV file follows a consistent format (e.g.
+        <a href="https://raw.githubusercontent.com/prof-rossetti/intro-software-dev-python-book/refs/heads/main/docs/data/daily_adjusted_NFLX.csv">"daily_adjusted_NFLX.csv"</a>
+        for NFLX).
+        This data was originally obtained from the AlphaVantage API.
     </p>
-
-    <h2>Setup</h2>
-    <p>First obtain an AlphaVantage API Key, and supply it when prompted.</p>
 
     <h2>Part 1</h2>
     <p>
         Write JavaScript code to answer the questions below.
         Log each of the answers to the console.
+        <strong>NOTE:</strong> Format all prices as currency using a dollar sign and rounding to two decimal places.
+        <strong>NOTE:</strong> Format all percentages with a percent sign and rounded to two decimals.
 
         <ol type="A">
-            <li>Define a function called <code>lookupCompany</code>. It should:
-                <ul>
-                    <li>Identify the stock symbol that has been input into the provided <code>input</code> element, and store it in a variable called <code>symbol</code>.</li>
-                    <li>Dynamically compile a request URL for the specified company, and store it in a variable called <code>requestUrl</code>.
-                    <li>Fetch information about the specified company using the specified request URL.</li>
-                    <li>Display information about the company, including its:
-                        name (i.e. "Netflix Inc"), description, and website URL.
-                    </li>
-                </ul>
+            <li>Choose one of the stock symbols listed above (i.e. "NFLX"), and store it in a variable called <code>symbol</code>.</li>
+            <li>Dynamically compile the corresponding dataset URL using the <code>symbol</code> variable from Question B,
+                and store it in a variable called <code>requestUrl</code>.</li>
+            <li>Fetch stock data for the chosen symbol, using the <code>requestUrl</code> from Question B.</li>
+            <li>Display the number of days in the provided data (i.e. 100).
+                <strong>NOTE:</strong> It is sufficient to just count the number of row objects.
             </li>
-            <li>Invoke the function once when the page initially loads (no need for an event listener).</li>
-            <li>Add an event listener to also invoke the function whenever the "Lookup" button is clicked. </li>
+            <li>Display the date and adjusted closing price on the earliest day (i.e. "2024-02-05" and "$562.06").</li>
+            <li>Display the date and adjusted closing price on the latest day (i.e. "2024-06-27" and "$684.34").</li>
+            <li>Calculate the overall percent change in adjusted closing price from the earliest to the latest day (i.e. "21.76%").</li>
         </ol>
     </p>
-
 
     <h2>Part 2</h2>
     <p>
         Write JavaScript code to answer the questions below.
         Display the answers on the page in the designated areas.
-    </p>
+        <strong>NOTE:</strong> when applicable, use the same currency and percent formatting as in Part 1.
 
-    <ol type="A">
-        <li>Revisit the <code>lookupCompany</code> function from Part 1. It should also:</li>
-            <ul>
-                <li>Display the company's name in the provided <code>span</code> element.</li>
-                <li>Display the company's description in the provided <code>span</code> element.</li>
-                <li>Display a hyperlink to the company's website in the provided <code>a</code> element. The link's text and <code>href</code> attribute should both be the website URL.</li>
-            </ul>
-    </ol>
+        <ol type="A">
+            <li>Using the designated <code>span</code> elements below,
+                display the stock symbol,
+                the earliest day's date and adjusted closing price,
+                the latest day's date and adjusted closing price,
+                and the overall percent change.
+            </li>
+        </ol>
+    </p>
 
     <hr>
     <h2>Display</h2>
-
-    <label>Stock Symbol:</label>
-    <input id="input-symbol" type="text" placeholder="NFLX" value="NFLX"></input>
-    <button id="lookup">Lookup</button>
-
-    <div id="display-company-info">
-        <p>Name: <span id="display-name">TODO</span></p>
-        <p>Description: <span id="display-description">TODO</span></p>
-        <p>Website: <a id="display-link" href="#TODO">TODO</span></p>
-    </div>
-
+    <p>Symbol: <span id="display-symbol">TODO</span></p>
+    <p>Earliest: <span id="display-earliest">TODO</span></p>
+    <p>Latest: <span id="display-latest">TODO</span></p>
+    <p>Percent Change: <span id="display-pct-change">TODO</span></p>
 
 
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script type="text/javascript">
-        // get references to DOM elements
-        const inputSymbol     = document.getElementById("input-symbol");
-        const lookupButton    = document.getElementById("lookup");
-        const nameSpan        = document.getElementById("display-name");
-        const descSpan        = document.getElementById("display-description");
-        const linkAnchor      = document.getElementById("display-link");
 
-        // fetch or prompt for API key
-        let apiKey = sessionStorage.getItem("ALPHAVANTAGE_API_KEY");
-        if (!apiKey) {
-            apiKey = prompt("Please enter your AlphaVantage API key:");
-            sessionStorage.setItem("ALPHAVANTAGE_API_KEY", apiKey);
+        function formatUSD(price) {
+            return `$${price.toFixed(2)}`;
         }
 
-        function lookupCompany() {
-            const symbol = inputSymbol.value.trim();
-            if (!symbol) {
-                alert("Please enter a stock symbol.");
-                return;
-            }
-
-            // build the Company Overview URL
-            const requestUrl = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${apiKey}`;
-
-            d3.json(requestUrl)
-              .then(data => {
-                  console.log("Company Overview Response:", data);
-
-                  // Log selected fields
-                  console.log("Name:",        data.Name);
-                  console.log("Description:", data.Description);
-                  console.log("Website:",     data.Website);
-
-                  // Populate the page
-                  nameSpan.textContent = data.Name || "N/A";
-                  descSpan.textContent = data.Description || "N/A";
-                  linkAnchor.href      = data.Website || "#";
-                  linkAnchor.textContent = data.Website || "N/A";
-              })
-              .catch(err => {
-                  console.error("ERROR fetching company overview:", err);
-                  alert("Could not fetch data. See console for details.");
-              });
+        function formatPct(pctDecimal) {
+            return `${(pctDecimal * 100).toFixed(2)}%`;
         }
 
-        // invoke on load
-        window.addEventListener("DOMContentLoaded", lookupCompany);
+        // —————— Part 1 Setup ——————
 
-        // invoke on button click
-        lookupButton.addEventListener("click", lookupCompany);
+        var symbol = "NFLX"; // one of: [AAPL, GOOGL, MSFT, NFLX, NVDA, SPOT]
+        var filename = `daily_adjusted_${symbol}.csv`;
+        var requestUrl = `https://raw.githubusercontent.com/prof-rossetti/intro-software-dev-python-book/refs/heads/main/docs/data/${filename}`;
+
+        d3.csv(requestUrl).then(function(data) {
+            console.log("DATA LOADED:", data);
+
+            console.log("---------------------");
+            console.log("PART 1...");
+
+            // A. Number of days
+            const numDays = data.length;
+            console.log("Number of days:", numDays);
+
+            // Assuming CSV is sorted newest → oldest:
+            const latest = data[0];
+            const earliest = data[data.length - 1];
+
+            // Parse prices
+            const latestDate = latest.timestamp;
+            const latestAdj = parseFloat(latest.adjusted_close);
+
+            const earliestDate = earliest.timestamp;
+            const earliestAdj = parseFloat(earliest.adjusted_close);
+
+            // B. Earliest day
+            console.log(
+                `Earliest day: ${earliestDate}, ${formatUSD(earliestAdj)}`
+            );
+
+            // C. Latest day
+            console.log(
+                `Latest day: ${latestDate}, ${formatUSD(latestAdj)}`
+            );
+
+            // D. Overall percent change
+            const pctChange = (latestAdj - earliestAdj) / earliestAdj;
+            console.log(
+                "Overall percent change:", formatPct(pctChange)
+            );
+
+            console.log("---------------------");
+            console.log("PART 2...");
+
+            // —————— Part 2: Inject into the page ——————
+
+            document.getElementById("display-symbol").textContent = symbol;
+            document.getElementById("display-earliest").textContent =
+                `${earliestDate} — ${formatUSD(earliestAdj)}`;
+            document.getElementById("display-latest").textContent =
+                `${latestDate} — ${formatUSD(latestAdj)}`;
+            document.getElementById("display-pct-change").textContent =
+                formatPct(pctChange);
+
+        }).catch(function(error) {
+            console.error("ERROR loading CSV:", error);
+        });
+
     </script>
 </body>
 </html>
