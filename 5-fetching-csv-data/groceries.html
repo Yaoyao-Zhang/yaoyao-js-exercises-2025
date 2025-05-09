@@ -74,35 +74,69 @@
             return `$${price.toFixed(2)}`
         }
 
-        var requestUrl = "https://raw.githubusercontent.com/prof-rossetti/intro-to-python/main/data/products.csv"
+        var requestUrl = "https://raw.githubusercontent.com/prof-rossetti/intro-to-python/main/data/products.csv";
 
         d3.csv(requestUrl).then(function(data) {
-            console.log("DATA:", data)
-            var products = data
+            console.log("DATA:", data);
+            var products = data;
 
-            console.log("---------------------")
-            console.log("PART 1...")
+            console.log("---------------------");
+            console.log("PART 1...");
 
+            // A. Fetch already done 
+            // B. Display number of products
+            console.log("Number of products:", products.length);
 
+            // C. Display name and price
+            products.forEach(function(product) {
+                let price = parseFloat(product.price);
+                console.log(`${product.name}: ${formatUSD(price)}`);
+            });
 
+            // D. Unique departments
+            var departments = [];
+            products.forEach(function(product) {
+                if (!departments.includes(product.department)) {
+                    departments.push(product.department);
+                }
+            });
 
+            // E. Number of unique departments
+            console.log("Number of unique departments:", departments.length);
 
+            // F. Display department names in upper-case
+            departments.forEach(function(dept) {
+                console.log(dept.toUpperCase());
+            });
 
-            console.log("---------------------")
-            console.log("PART 2...")
+            // G. Filter for beverages
+            var beverages = products.filter(p => p.department.toLowerCase() === "beverages");
 
+            // H. Display number of beverage products
+            console.log("Number of beverages:", beverages.length);
 
+            // I. Display average price of beverages
+            var beveragePrices = beverages.map(p => parseFloat(p.price));
+            var avgBeveragePrice = beveragePrices.reduce((sum, p) => sum + p, 0) / beveragePrices.length;
+            console.log("Average beverage price:", formatUSD(avgBeveragePrice));
 
+            console.log("---------------------");
+            console.log("PART 2...");
 
+            // A. Sort products by name
+            var sortedProducts = products.sort((a, b) => a.name.localeCompare(b.name));
 
+            // B. Display name and price on page
+            var ul = document.getElementById("display-groceries");
+            sortedProducts.forEach(function(product) {
+                let li = document.createElement("li");
+                li.textContent = `${product.name}: ${formatUSD(parseFloat(product.price))}`;
+                ul.appendChild(li);
+            });
 
-
-
-
-
-            }).catch(function(error) {
-                console.error("ERROR:", error)
-        })
+                }).catch(function(error) {
+                    console.error("ERROR:", error)
+            })
 
     </script>
 </body>
