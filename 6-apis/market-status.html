@@ -23,18 +23,8 @@
     <p>
         Write JavaScript code to answer the questions below.
         Log each of the answers to the console.
-
-        <ol type="A">
-            <li>Fetch market status data from the API.</li>
-            <li>Display the number of markets.</li>
-            <li>Filter the markets to identify only those that have a market type of "Equity", and store them in a variable called <code>equityMarkets</code>.</li>
-            <li>Display the number of equity markets.</li>
-            <li>Loop through the equity markets and display the market type and region of each.</li>
-            <li>Use a find operation to identify the equity market that has a region of "United States", and store it in a variable called <code>market</code>.</li>
-            <li>Display information about the US market, including: the market type, the primary exchanges, the local open and close time, and the current market status. Format the market status using all capital letters.</li>
-        </ol>
+        … (see list in original)
     </p>
-
 
     <h2>Part 2</h2>
     <p>
@@ -42,19 +32,8 @@
         Display the answers on the page in the designated areas.
     </p>
 
-    <ol type="A">
-        <li>Using the designated <code>span</code> elements below,
-            display information about the US market, including it's region, market type,
-            primary exchanges, local open and close times, and current status.
-        </li>
-    </ol>
-
     <hr>
     <h2>Display</h2>
-
-    <!--select name="region" id="select-region">
-        <option value="N/A">Select an Equity Market Region</option>
-    </select-->
 
     <div id="display-market-info">
         <p>Region: <span id="display-region">TODO</span></p>
@@ -65,49 +44,62 @@
         <p>Current Status: <span id="display-status">TODO</span></p>
     </div>
 
-
-
-
+    
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script type="text/javascript">
-
-        // AVOID HARD-CODING THE CREDENTIALS
-        // USE SESSION STORAGE TO MINIMIZE THE NUMBER OF TIMES WE HAVE TO PROVIDE THE CREDENTIAL
-        // check session storage for the API Key:
-        var apiKey = sessionStorage.getItem("ALPHAVANTAGE_API_KEY")
+        // grab or prompt for API key
+        var apiKey = sessionStorage.getItem("ALPHAVANTAGE_API_KEY");
         if (!apiKey) {
-            // if it isn't there, ask the user to supply it:
-            apiKey = prompt("Please enter your AlphaVantage API key:")
-            // store it in the session for later (so it will persist after refreshing the page)
-            sessionStorage.setItem("ALPHAVANTAGE_API_KEY", apiKey)
+            apiKey = prompt("Please enter your AlphaVantage API key:");
+            sessionStorage.setItem("ALPHAVANTAGE_API_KEY", apiKey);
         }
-
-
-
-
-        var requestUrl = `https://www.alphavantage.co/query?function=MARKET_STATUS&apikey=${apiKey}`
-        d3.json(requestUrl).then(function(data) {
-            console.log("RESPONSE:", data)
-
-            console.log("---------------------")
-            console.log("PART 1...")
-
-
-
-
-
-            console.log("---------------------")
-            console.log("PART 2...")
-
-
-
-
-        }).catch(function(error) {
-            console.error("ERROR:", error)
-        })
-
-
-
+    
+        // build URL and fetch
+        var requestUrl = `https://www.alphavantage.co/query?function=MARKET_STATUS&apikey=${apiKey}`;
+        d3.json(requestUrl)
+          .then(function(data) {
+            // 1. the markets array comes back as data.markets
+            var markets = data.markets;
+    
+            // PART 1: console logging
+            console.log("Total markets:", markets.length);
+    
+            // filter equity markets
+            var equityMarkets = markets.filter(m => m.marketType === "Equity");
+            console.log("Equity markets count:", equityMarkets.length);
+    
+            // list each equity market’s type + region
+            equityMarkets.forEach(m =>
+              console.log(`Type: ${m.marketType}, Region: ${m.region}`)
+            );
+    
+            // find the U.S. equity market
+            var usMarket = equityMarkets.find(m => m.region === "United States");
+    
+            if (usMarket) {
+              console.log("=== U.S. Equity Market Details ===");
+              console.log("Market Type:     ", usMarket.marketType);
+              console.log("Exchanges:       ", usMarket.primaryExchanges);
+              console.log("Local Open:      ", usMarket.localOpen);
+              console.log("Local Close:     ", usMarket.localClose);
+              console.log("Status:          ", usMarket.status.toUpperCase());
+            } else {
+              console.warn("U.S. equity market not found");
+            }
+    
+            // PART 2: update the page
+            if (usMarket) {
+              document.getElementById("display-region").textContent    = usMarket.region;
+              document.getElementById("display-type").textContent      = usMarket.marketType;
+              document.getElementById("display-exchanges").textContent = usMarket.primaryExchanges;
+              document.getElementById("display-open").textContent      = usMarket.localOpen;
+              document.getElementById("display-close").textContent     = usMarket.localClose;
+              document.getElementById("display-status").textContent    = usMarket.status.toUpperCase();
+            }
+          })
+          .catch(function(err) {
+            console.error("Fetch error:", err);
+          });
     </script>
 </body>
 </html>
